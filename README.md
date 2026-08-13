@@ -152,24 +152,6 @@ Built-in, zero-cost protection for personal-scale use:
 
 ---
 
-## 📦 Dependencies
-
-| Package | Required | Purpose |
-|---------|----------|---------|
-| `httpx` | ✅ Yes | HTTP client with async support |
-| `duckduckgo_search` | ❌ Optional | DuckDuckGo search engine |
-| `trafilatura` | ❌ Optional | Web scraping / text extraction |
-| `readability-lxml` | ❌ Optional | Readability article extraction |
-| `lxml[html_clean]` | ❌ Optional | HTML parsing for readability |
-| `justext` | ❌ Optional | Heuristic text extraction |
-| `newspaper3k` | ❌ Optional | Article parsing & NLP |
-| `playwright` | ❌ Optional | JS rendering, page interaction |
-| `master-fetch` (Hound) | ❌ Optional | Cloudflare bypass, smart fetch |
-
-Missing engines are skipped automatically — no crashes.
-
----
-
 ## 📄 License
 
 MIT — see [LICENSE](LICENSE) for details.
