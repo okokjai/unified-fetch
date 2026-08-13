@@ -3,12 +3,11 @@
 # 🌐 unified-fetch
 
 **Multi-engine web search & scraping MCP server for AI agents.**
-**4 search engines · 6 scrape engines · tiered fallback · zero API keys**
+**4 search engines · 6 scrape engines · adaptive fallback · zero API keys**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org)
 [![MCP](https://img.shields.io/badge/MCP-Ready-orange.svg)](https://modelcontextprotocol.io)
-[![Hound](https://img.shields.io/badge/Hound-integrated-8A2BE2.svg)](https://github.com/dondai1234/master-fetch)
 [![Playwright](https://img.shields.io/badge/Playwright-optional-green.svg)](https://playwright.dev)
 
 ```bash
@@ -26,14 +25,47 @@ Give your AI agent the web. Zero accounts. No API keys. Self-hosted.
 
 | Category | Capabilities |
 |----------|-------------|
-| 🔍 **Search** (4 engines) | Hound → DuckDuckGo → Google Search → DirectFetch — adaptive fallback |
-| 📄 **Scrape** (6 engines) | Hound → newspaper3k → Trafilatura → readability → jusText → DirectFetch — auto fallback |
+| 🔍 **Search** (4 engines) | 4 search engines with adaptive fallback — auto-switch on failure |
+| 📄 **Scrape** (6 engines) | 6 extraction engines with tiered fallback — auto-switch on empty content |
 | 🔬 **Deep Search** (3 sources) | GitHub API + npm API + MDN API — parallel technical search |
 | 🕷️ **Crawl** | BFS site crawler with depth/pages/domain constraints — anti-crawl aware |
 | 🗺️ **Map** | Site structure discovery: sitemap + internal link tree + category hierarchy |
 | 🎭 **Interact** | Playwright-driven page interaction: click, fill, hover, screenshot, scroll |
 | 🧠 **Smart Browse** | SPA-aware: detects JS-heavy pages, forces dynamic rendering |
 | ⚡ **Parallel** | Scrape multiple URLs concurrently (semaphore-capped at 5) |
+
+---
+
+## 🎯 Search & Scrape Strategy
+
+### Search Strategy (4 engines)
+
+| Order | Engine | Role |
+|-------|--------|------|
+| 1 | **Smart Fetch** | Primary — quality results first, SPA-aware rendering |
+| 2 | **DuckDuckGo** | Fast, no login required |
+| 3 | **Google Search** | Broadest coverage |
+| 4 | **DirectFetch** | Last resort — parses results directly from the search page |
+
+**Fallback rules:**
+- Engine fails or returns 0 results → automatically switch to next engine
+- **Circuit breaker**: 3 consecutive failures → 30s cooldown per engine (no hammering a dead engine)
+- All engines fail → returns structured error with `retryable` flag
+
+### Scrape Strategy (6 engines)
+
+| Order | Engine | Role |
+|-------|--------|------|
+| 1 | **Smart Fetch** | Primary — Cloudflare bypass + JS rendering when needed |
+| 2 | **newspaper3k** | Article extraction (headlines, body, dates) |
+| 3 | **Trafilatura** | Clean main-content extraction, language-aware |
+| 4 | **Readability** | Distills article text from cluttered pages |
+| 5 | **jusText** | Heuristic boilerplate removal |
+| 6 | **DirectFetch** | Last resort — raw fetch + text normalization |
+
+**Fallback rules:**
+- Engine fails or returns empty content → automatically switch to next engine
+- Each engine's timeout is independent (no single dead endpoint blocks the chain)
 
 ---
 
@@ -45,14 +77,14 @@ Give your AI agent the web. Zero accounts. No API keys. Self-hosted.
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │              Search Layer (4 engines)                    │   │
-│  │  Hound → DuckDuckGo → Google Search → DirectFetch       │   │
+│  │  Smart Fetch → DuckDuckGo → Google → DirectFetch        │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                              │                                  │
 │                              ▼                                  │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │              Scrape Layer (6 engines)                    │   │
-│  │  Hound → newspaper3k → Trafilatura → readability →      │   │
-│  │  jusText → DirectFetch                                  │   │
+│  │  Smart Fetch → newspaper3k → Trafilatura → readability  │   │
+│  │  → jusText → DirectFetch                                │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                              │                                  │
 │          ┌──────────────────┼────────────────────┐              │
@@ -65,18 +97,6 @@ Give your AI agent the web. Zero accounts. No API keys. Self-hosted.
 │  ⚡ Anti-crawl: random UA pool · random delays · cookie jar     │
 │  ⚡ Circuit breaker: 3 failures → 30s cooldown per engine      │
 └─────────────────────────────────────────────────────────────────┘
-```
-
-### Engine Fallback Chain
-
-```
-Search:  Hound ──→ DuckDuckGo ──→ Google Search ──→ DirectFetch
-                     ↓ (on failure/empty results)
-                 next engine automatically
-
-Scrape:  Hound ──→ newspaper3k ──→ Trafilatura ──→ readability ──→ jusText ──→ DirectFetch
-                     ↓ (on failure/empty content)
-                 next engine automatically
 ```
 
 ---
@@ -127,7 +147,7 @@ Add to your `~/.claude/mcp_servers.json`:
 
 | Tool | Description |
 |------|-------------|
-| `search` | Search web. 4 engines: Hound → DuckDuckGo → Google → DirectFetch |
+| `search` | Search web. 4 engines with adaptive fallback |
 | `scrape` | Scrape URL to text. 6 engines with tiered fallback |
 | `status` | Check engine availability |
 | `deep_search` | Parallel technical search across GitHub, npm, and MDN |
