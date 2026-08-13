@@ -173,9 +173,3 @@ Missing engines are skipped automatically — no crashes.
 ## 📄 License
 
 MIT — see [LICENSE](LICENSE) for details.
-
----
-
-## 🙏 Credits
-
-- **[Hound / master-fetch](https://github.com/dondai1234/master-fetch)** — Smart fetch engine with Cloudflare bypass (used as primary engine when available)
