@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-unified_browser.py — UnifiedBrowser integration entry point.
+unified_browser.py — UnifiedBrowser 整合入口.
 
 Integrates all layers into a single coherent browser API:
 
@@ -200,7 +200,18 @@ class UnifiedBrowser:
     # ── Session-based API (for MCP / multi-step workflows) ─────────
 
     async def _get_or_create_session(self, domain: str) -> tuple[Any, Any]:
-        """Get or create a persistent session for a domain."""
+        """Get or create a persistent session for a domain.
+
+        The persistent session model is keyed by domain. For non-http(s) URLs
+        (data:, file:, about:) there is no routable domain — normalizing them
+        to a fixed key keeps a single reuseable session (each navigate() to a
+        data:/file: URL issues a fresh Page.navigate on that same session),
+        and mirrors http(s) behavior where the session is one per site.
+        """
+        scheme = urlparse(domain).scheme
+        if scheme not in ("http", "https"):
+            domain = f"__internal__:{scheme or 'non-http'}"
+
         if domain in self._active_sessions:
             state = self._active_sessions[domain]
             # Check if session is still alive

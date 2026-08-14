@@ -236,12 +236,12 @@ class CircuitBreaker:
 
 
 # ═══════════════════════════════════════════════════════════════════
-# ENGINE ABSTRACTION (pluggable core)
+# ENGINE ABSTRACTION (可插拔核心)
 # ═══════════════════════════════════════════════════════════════════
 
 class Engine:
     name: str = "engine"
-    optional: bool = False          # True = Tier 1 (optional)
+    optional: bool = False          # True = Tier 1 (選配)
 
     @classmethod
     def is_available(cls) -> bool:
@@ -784,7 +784,7 @@ class MDNSearchEngine(SearchEngine):
 
 
 # ═══════════════════════════════════════════════════════════════════
-# HOUND ENGINE (Tier 1 — optional. deep anti-bot / PDF OCR / neural outsourcing)
+# HOUND ENGINE (Tier 1 — optional. 深度反爬/PDF OCR/neural 委外)
 # ═══════════════════════════════════════════════════════════════════
 
 class HoundEngine(ScrapeEngine):
@@ -954,7 +954,7 @@ class BrowserSearchEngine(SearchEngine):
 
 
 # ═══════════════════════════════════════════════════════════════════
-# ENGINE REGISTRY (order = priority)
+# ENGINE REGISTRY (順序 = 優先序)
 # ═══════════════════════════════════════════════════════════════════
 
 def _available(chain: list) -> list:
@@ -962,21 +962,21 @@ def _available(chain: list) -> list:
 
 
 SCRAPE_CHAIN: list = [
-    HoundEngine,            # Tier 1 optional (deep anti-bot / PDF / neural) — use first if available
+    HoundEngine,            # Tier 1 選配（深度反爬/PDF/neural）——有就先用
     NewspaperEngine,
     TrafilaturaEngine,
     ReadabilityEngine,
     JusTextEngine,
-    DirectEngine,           # last resort HTTP
-    BrowserScrapeEngine,    # CORE: UnifiedBrowser (upgrade target)
+    DirectEngine,           # 最後手段 HTTP
+    BrowserScrapeEngine,    # CORE：UnifiedBrowser（升級目標）
 ]
 
 SEARCH_CHAIN: list = [
     DuckDuckGoEngine,
-    GoogleEngine,           # Tier 1 optional
-    HoundEngine,            # Tier 1 optional
+    GoogleEngine,           # Tier 1 選配
+    HoundEngine,            # Tier 1 選配
     DirectSearchEngine,
-    BrowserSearchEngine,    # CORE: last resort
+    BrowserSearchEngine,    # CORE：最後手段
 ]
 
 DEEP_SOURCES: dict = {
@@ -1276,7 +1276,7 @@ class Unified:
             self._cache.set(ck, result, ttl=config.cache_default_ttl)
         return result
 
-    # ── smart_browse: UnifiedBrowser-first (primary entry point) ─────────
+    # ── smart_browse: UnifiedBrowser-first (主力意志入口) ─────────
 
     async def smart_browse(self, url: str, max_age_months: int = 12,
                            require_fresh: bool = False) -> dict:
@@ -1367,7 +1367,7 @@ class Unified:
                 return await self.scrape(url, prefer_browser=prefer_browser, focus=focus)
         return await asyncio.gather(*[_one(u) for u in urls])
 
-    # ── crawl / map (HTTP BFS, single-page failure → upgrade to browser) ─────────────────
+    # ── crawl / map (HTTP BFS, 單頁失敗升瀏覽器) ─────────────────
 
     async def crawl(self, start_url: str, max_depth: int = 3, max_pages: int = 50,
                     stay_domain: bool = True) -> dict:
@@ -1918,11 +1918,11 @@ async def serve_mcp():
             )
 
     app = Server("unified-fetch", version="2.0.0",
-                 on_list_tools=handle_list, on_call_tool=handle_call)
+                 on_list_tools=handle_list, on_call_tool=handle_call,
+                 instructions=ORIENTATION)
 
     async with stdio_server() as (rs, ws):
-        await app.run(rs, ws, app.create_initialization_options(
-            extensions={"instructions": {"text": ORIENTATION}}))
+        await app.run(rs, ws, app.create_initialization_options())
         logger.info("unified-fetch-v2 ready")
 
 

@@ -660,7 +660,7 @@ class BotPageDetector:
 
 
 # ═══════════════════════════════════════════════════════════════════
-# AntiDetectFacade — Integrated anti-detection entry point
+# AntiDetectFacade — 集成的反偵測入口
 # ═══════════════════════════════════════════════════════════════════
 
 class AntiDetect:

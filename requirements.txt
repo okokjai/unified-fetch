@@ -1,16 +1,16 @@
-# Tier 0 — installed and ready, zero config
-# browser/ core hard dependencies are only mcp + websockets (rest CDP all stdlib)
+# Tier 0 — 安裝即有，零設定
+# browser/ 核心硬依賴只有 mcp + websockets（其餘 CDP 全 stdlib）
 
 mcp>=1.0.0
 websockets>=12.0
 
-# HTTP layer (L0-L1)
+# HTTP 層（L0-L1）
 httpx>=0.27.0
 
-# Search (Tier 0)
+# 搜索（Tier 0）
 duckduckgo_search>=6.0.0
 
-# Content extraction (Tier 0)
+# 內容提取（Tier 0）
 trafilatura>=1.8.0
 readability-lxml>=0.8.1
 lxml[html_clean]>=5.2.0

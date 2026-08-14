@@ -18,6 +18,7 @@ Layers:
 
 import asyncio
 import os
+import pathlib
 import shutil
 import sys
 import tempfile
@@ -229,9 +230,9 @@ async def test_screenshot_isolation():
     png = await ub.screenshot()
     check(len(png) > 5000 and png[:4] == b"\x89PNG", f"Screenshot {len(png)}B PNG", "")
     await ub.evaluate("document.cookie = 'ub_test_a=val_a; path=/'")
-    await ub.navigate("https://httpbin.org/html", wait_until="load")
+    await ub.navigate("https://example.net/", wait_until="load")
     c1 = await ub.evaluate("document.cookie") or ""
-    check("ub_test_a" not in c1, "Cookies isolated between sites", f"LEAK {c1[:100]}")
+    check("ub_test_a" not in c1, "Cookies isolated between sites (example.com→example.net)", f"LEAK {c1[:100]}")
     await ub.close()
     shutil.rmtree(tmpdir, ignore_errors=True)
 
@@ -244,7 +245,28 @@ async def test_interact_methods():
                                min_instances=1, max_instances=1, human_behavior=False)
     ub = UnifiedBrowser(cfg)
     await ub.initialize()
-    await ub.navigate("http://httpbin.org/forms/post", wait_until="load")
+    # Write a self-contained form to a local HTML file (no external dependency)
+    form_html = os.path.join(tmpdir, "form.html")
+    with open(form_html, "w", encoding="utf-8") as f:
+        f.write("""<html><body>
+<form method="post" action="/post">
+<p><label>Customer name: <input name="custname"></label></p>
+<p><label>Telephone: <input type="tel" name="custtel"></label></p>
+<p><label>E-mail address: <input type="email" name="custemail"></label></p>
+<fieldset><legend>Pizza Size</legend>
+<p><label><input type="radio" name="size" value="small"> Small</label></p>
+<p><label><input type="radio" name="size" value="medium"> Medium</label></p>
+<p><label><input type="radio" name="size" value="large"> Large</label></p>
+</fieldset>
+<p><label>Toppings: <select name="size">
+<option value="small">Small</option>
+<option value="medium">Medium</option>
+<option value="large">Large</option>
+</select></label></p>
+<p><button>Submit order</button></p>
+</form></body></html>""")
+    form_url = pathlib.Path(form_html).as_uri()
+    await ub.navigate(form_url, wait_until="load")
     ok = await ub.fill("input[name=custname]", "Paul")
     check(ok, "fill() OK", "")
     val = await ub.evaluate("document.querySelector('input[name=custname]').value")
@@ -252,7 +274,7 @@ async def test_interact_methods():
     ok = await ub.hover("input[name=custname]")
     check(ok, "hover() OK", "")
     ok = await ub.select("select[name=size]", value="medium")
-    log_info(f"select: {ok} (httpbin has no <select>; informational)")
+    check(ok, "select(value='medium') OK", "select failed")
     ok = await ub.wait_for("input[name=custname]", timeout=5)
     check(ok, "wait_for() OK", "")
     await ub.close()
@@ -365,7 +387,18 @@ async def test_parallel_search():
 async def test_cdp_interact():
     step("Layer D5: browser_interact — CDP-native end-to-end")
     mod = load_server()
-    r = await mod.browser_interact("navigate", url="http://httpbin.org/forms/post")
+    # Use local file form (same as Layer B5 — httpbin.org is unreliable)
+    import tempfile
+    import os
+    _tmpdir = tempfile.mkdtemp(prefix="ub_d5_")
+    _form_path = os.path.join(_tmpdir, "form.html")
+    with open(_form_path, "w", encoding="utf-8") as f:
+        f.write("""<html><body>
+<form method="post" action="/post">
+<p><label>Customer name: <input name="custname"></label></p>
+</form></body></html>""")
+    _form_url = pathlib.Path(_form_path).as_uri()
+    r = await mod.browser_interact("navigate", url=_form_url)
     check(r["ok"], "navigate forms page", f"{r.get('error')}")
     r = await mod.browser_interact("fill", selector="input[name=custname]", value="Paul")
     check(r["ok"], "fill", "")
@@ -376,10 +409,12 @@ async def test_cdp_interact():
     check(r["ok"] and len(r.get("content", "")) > 0, "get_text", "")
     r = await mod.browser_interact("screenshot")
     check(r["ok"] and r.get("bytes", 0) > 5000, "screenshot", "")
+    import shutil
+    shutil.rmtree(_tmpdir, ignore_errors=True)
 
 
 async def test_smart_browse():
-    step("Layer D6: smart_browse — UnifiedBrowser-first (primary intent)")
+    step("Layer D6: smart_browse — UnifiedBrowser-first (主力意志)")
     mod = load_server()
     u = mod.Unified()
     r = await u.smart_browse("https://example.com/", require_fresh=True)

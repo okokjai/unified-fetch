@@ -266,7 +266,7 @@ class SessionPool:
         self._id_counter += 1
         profile = self._get_profile_for_site(site)
 
-        name = f"site_{site.replace('.', '_')}"
+        name = f"site_{site.replace('.', '_').replace(':', '_')}"
         headful = site in self._headful_sites
         instance = BrowserInstance(name, profile, headful=headful)
         self._instances[name] = instance
