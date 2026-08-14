@@ -1,5 +1,11 @@
 # 🌐 unified-fetch V2
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/okokjai/unified-fetch?style=flat&logo=github)](https://github.com/okokjai/unified-fetch)
+[![GitHub Release](https://img.shields.io/github/v/release/okokjai/unified-fetch?style=flat&logo=github)](https://github.com/okokjai/unified-fetch/releases)
+[![Platform: Claude Code](https://img.shields.io/badge/Platform-Claude%20Code-8A2BE2?style=flat&logo=anthropic)](https://claude.ai/code)
+[![Zero Python MCP](https://img.shields.io/badge/Zero%20Python%20MCP-✅-brightgreen?style=flat)](https://github.com/okokjai/unified-fetch)
+
 **Browser-core MCP server for Claude Code. HTTP-first, auto-upgrades to a CDP-native stealth browser. Zero Python dependencies required.**
 
 ```
@@ -252,5 +258,5 @@ unified-fetch-v2/
 
 *Last updated: 2026-08-14*
 *Author: PaulPaul + Claude Code*
-*Platform: Claude Code · Zero Python MCP · MIT License*
+*License: MIT · Platform: Claude Code · Zero Python MCP*
 *Status: v2.0.0 — 112/112 assertions + 496/496 fingerprint + SO headful breakthrough + CF real-world verified*
