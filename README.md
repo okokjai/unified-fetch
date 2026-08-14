@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌐 unified-fetch V2
+<h1 align="center">unified-fetch V2</h1>
 
 **Browser-core MCP server — HTTP speed meets stealth-browser penetration**
 **HTTP-first · CDP-native · Cloudflare breakthrough · zero config**
