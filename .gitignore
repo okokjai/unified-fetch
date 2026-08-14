@@ -1,28 +1,11 @@
-# OS artifacts
-.DS_Store
-Thumbs.db
-Desktop.ini
-
-# Editor/IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*~
-
-# Python
 __pycache__/
 *.pyc
 *.pyo
-.venv/
-venv/
-env/
-
-# Claude Code local settings
-.claude/
+.egg-info/
+dist/
+build/
+*.db
+*.sqlite
+*.log
+.DS_Store
+Thumbs.db

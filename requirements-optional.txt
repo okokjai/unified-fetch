@@ -1,0 +1,15 @@
+# Tier 1 — optional engine, auto-enabled if installed, auto-skipped if not
+
+# Hound (master-fetch): deep anti-crawl / PDF OCR / neural ranking
+# https://github.com/dondai1234/master-fetch
+master-fetch
+
+# Playwright: only drag + frame action fallback for browser_interact
+# Browser binary needs separate install: python -m playwright install chromium
+playwright>=1.45.0
+
+# L2 TLS fingerprint (interface retained, not currently enforced)
+curl_cffi>=0.7.0
+
+# Backup search
+googlesearch-python>=1.2.0
