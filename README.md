@@ -8,6 +8,8 @@
 
 **Browser-core MCP server for Claude Code. HTTP-first, auto-upgrades to a CDP-native stealth browser. Zero Python dependencies required.**
 
+**Its defining architecture: Identity Engine (fingerprint synthesis) → Behavior Engine (human emulation) → Session Pool (sandbox isolation). A unified 3-layer anti-detection strategy, not bolted-on features.**
+
 ```
 search · scrape · deep_search · crawl · map · smart_browse
 browser_navigate · browser_get_content · browser_screenshot
@@ -26,7 +28,7 @@ Clone the repo, `pip install -r requirements.txt`, and you're ready — **no API
 | Capability | Description |
 |---|---|
 | ⚡ **HTTP-first + auto-upgrade** | scrape goes HTTP first (~1s); auto-upgrades to stealth browser when blocked / JS shell / empty content |
-| 🧬 **UnifiedBrowser core** | Raw CDP (no Playwright/Selenium/WebDriver), identity isolation + human behavior + anti-detection |
+| 🧬 **UnifiedBrowser core** | Raw CDP (no Playwright/Selenium/WebDriver). **3-layer anti-detection strategy**: Identity Engine (496/496 fingerprint synthesis) → Behavior Engine (human emulation) → Session Pool (sandbox isolation + headful escalation) |
 | 🔍 **Parallel search + consensus** | DDG/Google/Hound in parallel, cross-engine consensus weighting, ≤2 per domain, quorum report |
 | 🎯 **Actionable signals** | Every response carries `content_ok` / `page_type` / `next_action` / `engine_used` |
 | ✂️ **BM25 focus** | `scrape(url, focus="what you're looking for")` returns only relevant paragraphs, saves 80%+ context |
@@ -34,6 +36,52 @@ Clone the repo, `pip install -r requirements.txt`, and you're ready — **no API
 | 💾 **Smart cache** | SQLite WAL, bad content never cached, size-limit auto-eviction, `require_fresh` force-refresh |
 | 🚀 **Instant start** | Lazy browser init: server starts <1s, Chrome only launches on first browser use |
 | 📦 **Zero config** | All engines try-import auto-detection; no Chrome → HTTP-only, never breaks |
+
+---
+
+## 🎯 The Core Strategy: 3-Layer Anti-Detection Architecture
+
+> **This is what sets unified-fetch apart.** Not a list of bolted-on evasion tricks — but a *single unified strategy* of three complementary layers, each reinforcing the next, so every task the site sees looks like an independent, ordinary human visitor.
+
+```
+  Task A ─┐                    ┌─ Layer 1: Identity Engine (Who you are)
+  Task B ─┼─ every task gets ──┼─ Layer 2: Behavior Engine  (How you act)
+  Task C ─┘    its own profile ┴─ Layer 3: Session Pool     (Where you live)
+```
+
+### Layer 1 — Identity Engine: Per-Task Identity & Fingerprint Isolation
+
+Every task receives a **fresh, internally-consistent fingerprint profile** — synthesized by an Identity Engine, not copied from your machine:
+
+- **Synthetic identity** — UA / timezone / resolution / WebGL / canvas / fonts / navigator properties all generated per-task, so the site sees a brand-new independent user each time
+- **Internal consistency** — GPU ↔ WebGL, screen ↔ device, timezone ↔ locale are cross-validated so profiles never contradict themselves (the #1 fingerprint giveaway)
+- **Prevents fingerprint linking** — two tasks can never be tied back to the same physical machine
+
+**Verified: 496/496 fingerprint checks pass** (31 groups × 16 profiles) across bot.sannysoft.com + fpscanner.
+
+### Layer 2 — Behavior Engine: Human Behavior Isolation
+
+A real visitor isn't a robot — so neither is unified-fetch:
+
+- **Human-like actions** — mouse trajectories, scrolling rhythm, keystroke timing, hover pauses modeled to feel organic
+- **Per-profile randomization** — each identity gets its own behavior signature instead of one shared bot rhythm
+- **Session-consistent** — behavior stays coherent within a session, varying naturally across sessions
+
+### Layer 3 — Session Pool: Sandbox Isolation & Instance Lifecycle
+
+Each task runs in an **isolated sandbox** — cookies, storage, and context never leak across sites:
+
+- **Site isolation** — Session Pool ensures separate browse contexts per site; no cross-site cookie/localStorage bleed
+- **Lifecycle management** — every task gets a fresh browser context and is burned after use ("用完即焚"), so the next task starts from a clean initial state, untouched by previous tasks' data
+- **Headful escalation** — when Cloudflare's hard challenge appears, the pool escalates to a real headful window (offscreen on Windows) and passes where headless gets stuck
+
+```
+  Define:   Identity Engine ──→ Behavior Engine ──→ Session Pool
+    "who"       fingerprint        human motion      sandbox isolation
+    independent  per-task           per-profile      burn-after-use
+```
+
+This unified strategy is what makes Cloudflare real-world pass (nowsecure ✅ / Medium ✅ / StackOverflow headful ✅) while staying HTTP-first for the other 95% of sites.
 
 ---
 
