@@ -1,12 +1,29 @@
-# unified-fetch V2
+<div align="center">
 
-**An MCP server that delivers HTTP speed with stealth-browser penetration. Zero config — clone and run.**
+# 🌐 unified-fetch V2
+
+**An MCP server that delivers HTTP speed with stealth-browser penetration.**
+**Zero config. Zero API keys. Clone and run.**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org)
+[![MCP](https://img.shields.io/badge/MCP-Ready-orange.svg)](https://modelcontextprotocol.io)
+[![GitHub stars](https://img.shields.io/github/stars/okokjai/unified-fetch?style=social)](https://github.com/okokjai/unified-fetch)
+[![Release](https://img.shields.io/github/v/release/okokjai/unified-fetch)](https://github.com/okokjai/unified-fetch/releases)
 
 ```
 search · scrape · deep_search · crawl · map · smart_browse
 browser_navigate · browser_get_content · browser_screenshot
 browser_evaluate · browser_interact · browser_status · status
 ```
+
+**Works with Claude Code · Cursor · Windsurf · any MCP client**
+
+Give your AI agent the web. No browser-first overhead. No Playwright dependency. No config files.
+
+</div>
+
+---
 
 > **v2.0.0** — HTTP-first auto-upgrade engine + CDP-native stealth browser + Cloudflare real-world breakthrough + 496/496 fingerprint verification
 
@@ -28,7 +45,7 @@ When building AI agents, you encounter three kinds of websites:
 
 ## Why unified-fetch V2?
 
-### Rocket: Works Out of the Box
+### Works Out of the Box
 
 ```
 git clone + pip install -r requirements.txt
@@ -39,7 +56,7 @@ git clone + pip install -r requirements.txt
 - **Edge auto-detection**: Edge is built into Windows — no extra browser install needed
 - No Chrome on the machine? HTTP engines keep working without errors
 
-### Speed: HTTP-First Architecture
+### HTTP-First Speed
 
 ```
 The default path for scrape(url):
@@ -56,7 +73,7 @@ The default path for scrape(url):
 - Upgrades only when needed, max 2 levels, no infinite retry loops
 - `prefer_browser=true` reserved for cases that genuinely need a browser
 
-### Core: CDP-Native Stealth Browser (No Playwright, No Selenium)
+### CDP-Native Stealth Core (No Playwright, No Selenium)
 
 ```
 UnifiedBrowser (browser/ package)
@@ -72,7 +89,7 @@ UnifiedBrowser (browser/ package)
 - **Human behavior**: mouse moves along Bezier curves with acceleration; typing has 2% typo rate
 - **Site isolation**: each site gets its own identity — no cookie leakage across domains
 
-### Search: Parallel + Consensus
+### Parallel Search + Consensus
 
 ```
 DDG + Google + Hound sent in parallel
